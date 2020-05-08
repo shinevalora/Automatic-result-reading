@@ -183,7 +183,8 @@ def save_csv(data, path):
                         vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
 
             else:
-                exit(-1)
+                logging.error("has some  error! ")
+                break
 
     file.close()
 
