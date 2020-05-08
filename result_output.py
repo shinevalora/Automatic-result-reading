@@ -20,7 +20,7 @@ def read_excel(path):
     rows = data.nrows
     cols = data.ncols
 
-    logging.info(f"读取表格信息：\t{path},\t{rows}\t行,\t{cols}\t列\n")
+    logging.info(f"读取表格信息：\t{path},\t{rows}\t行,\t{cols}\t列")
 
     for i in range(rows):
         if i > 6:
@@ -48,6 +48,7 @@ def save_csv(data, path):
     """
     判断分型结果后csv保存
     """
+    logging.info(f"此次实验总共有 {len(data) + 1} 个样本")
 
     file = open(path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
     file.write(
@@ -183,8 +184,6 @@ def save_csv(data, path):
 
             else:
                 exit(-1)
-
-    logging.info(f"此次实验总共有 {i + 1} 个样本\n")
 
     file.close()
 
