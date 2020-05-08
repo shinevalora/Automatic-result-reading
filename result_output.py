@@ -5,7 +5,7 @@ from xlrd import open_workbook
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-8s: %(message)s")
 
 
-def read_excel(excel_path):
+def read_excel(path):
     """
     读取表格实验数据信息直接过滤掉从7500导出excle的前六行信息
     """
@@ -14,13 +14,13 @@ def read_excel(excel_path):
     data_rox = []
     data_total = []
 
-    excel = open_workbook(excel_path)
+    excel = open_workbook(path)
     data = excel.sheet_by_index(0)
 
     rows = data.nrows
     cols = data.ncols
 
-    logging.info(f"读取表格信息：\t{excel_path},\t{rows}\t行,\t{cols}\t列\n")
+    logging.info(f"读取表格信息：\t{path},\t{rows}\t行,\t{cols}\t列\n")
 
     for i in range(rows):
         if i > 6:
@@ -44,16 +44,16 @@ def read_excel(excel_path):
     return data_total
 
 
-def save_csv(data_total, csv_path):
+def save_csv(data, path):
     """
     判断分型结果后csv保存
     """
 
-    file = open(csv_path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
+    file = open(path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
     file.write(
         'Result' + "," + 'Well' + "," + 'Sample Name' + "," + 'Target Name' + "," + 'Reporter' + "," + 'Ct' + "," + 'Target Name' + "," + 'Reporter' + "," + 'Ct' + "," + 'Target Name' + "," + 'Reporter' + "," + 'Ct' + "\n")
 
-    for i, j in enumerate(data_total):
+    for i, j in enumerate(data):
         if j[0][0] == j[1][0] == j[2][0] and j[0][1] == j[1][1] == j[2][1]:
             well, sample_name = j[0][0], j[0][1]
             fam_target, fam_reporter, fam_ct = j[0][2], j[0][4], j[0][6]
