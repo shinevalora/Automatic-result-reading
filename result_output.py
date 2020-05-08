@@ -48,145 +48,124 @@ def save_csv(data, path):
     """
     判断分型结果后csv保存
     """
-    logging.info(f"此次实验总共有 {len(data) + 1} 个样本")
+    logging.info(f"此次实验总共有 {len(data)} 个样本")
+    field_name = [
+        'Result',
+        'Well',
+        'Sample Name',
+        'Target Name',
+        'Reporter',
+        'Ct',
+        'Target Name',
+        'Reporter',
+        'Ct',
+        'Target Name',
+        'Reporter',
+        'Ct'
+    ]
 
     file = open(path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
-    file.write(
-        'Result' + "," + 'Well' + "," + 'Sample Name' + "," + 'Target Name' + "," + 'Reporter' + "," + 'Ct' + "," + 'Target Name' + "," + 'Reporter' + "," + 'Ct' + "," + 'Target Name' + "," + 'Reporter' + "," + 'Ct' + "\n")
+    file.write(",".join(field_name) + "\n")
 
-    for i, j in enumerate(data):
-        if j[0][0] == j[1][0] == j[2][0] and j[0][1] == j[1][1] == j[2][1]:
-            well, sample_name = j[0][0], j[0][1]
-            fam_target, fam_reporter, fam_ct = j[0][2], j[0][4], j[0][6]
-            vic_target, vic_reporter, vic_ct = j[1][2], j[1][4], j[1][6]
-            rox_target, rox_reporter, rox_ct = j[2][2], j[2][4], j[2][6]
+    count = 0
 
-            # print(well,sample_name,fam_target,fam_reporter,fam_ct,vic_target,vic_reporter,vic_ct,rox_target,rox_reporter,rox_ct)
+    for item in data:
+        if item[0][0] == item[1][0] == item[2][0] and item[0][1] == item[1][1] == item[2][1]:
+            count += 1
+            well, sample_name = item[0][0], item[0][1]
+            fam_target, fam_reporter, fam_ct = item[0][2], item[0][4], item[0][6]
+            vic_target, vic_reporter, vic_ct = item[1][2], item[1][4], item[1][6]
+            rox_target, rox_reporter, rox_ct = item[2][2], item[2][4], item[2][6]
+
+            _data = [
+                well, sample_name, fam_target, fam_reporter, str(fam_ct), vic_target, vic_reporter, str(vic_ct),
+                rox_target, rox_reporter, str(rox_ct)
+            ]
+
+            _data = [str(i) for i in _data]
+
+            logging.debug(_data)
+
+            result = ""
 
             if sample_name == "NTC":
                 if str(fam_ct) == "Undetermined" and str(vic_ct) == "Undetermined" and str(rox_ct) == "Undetermined":
-                    file.write("," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                    result = ""
                 else:
-                    file.write(
-                        "NTC  异常" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                            fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                            vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                    result = "NTC  异常"
             elif sample_name == "P":
-                if float(fam_ct) <= 30 and float(vic_ct) <= 30 and float(rox_ct) <= 30:
-                    file.write("," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
-                else:
-                    file.write(
-                        "阳性对照  异常" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                            fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                            vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
 
+                if float(fam_ct) <= 30 and float(vic_ct) <= 30 and float(rox_ct) <= 30:
+                    result = ""
+                else:
+                    result = "阳性对照  异常"
             elif float(rox_ct) <= 32:
                 if type(fam_ct) is float:
                     if type(vic_ct) is float:
-                        if fam_ct <= 36 and vic_ct > 36:
+                        if fam_ct <= 36 < vic_ct:
                             if fam_target == "285FAM":
-                                file.write(
-                                    "*2  G/G   纯合野生" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*2  G/G   纯合野生"
+
                             if fam_target == "893FAM2":
-                                file.write(
-                                    "*3  G/G   纯合野生" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*3  G/G   纯合野生"
                             if fam_target == "560FAM2":
-                                file.write(
-                                    "*17  C/C   纯合野生" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*17  C/C   纯合野生"
 
                         if fam_ct <= 36 and vic_ct <= 36:
                             if fam_target == "285FAM":
-                                file.write(
-                                    "*2   G/A   杂合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
-                            if fam_target == "893FAM2":
-                                file.write(
-                                    "*3   G/A   杂合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
-                            if fam_target == "560FAM2":
-                                file.write(
-                                    "*17  C/T   杂合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*2   G/A   杂合突变"
 
-                        if fam_ct > 36 and vic_ct <= 36:
-                            if fam_target == "285FAM":
-                                file.write(
-                                    "*2   A/A   纯合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
                             if fam_target == "893FAM2":
-                                file.write(
-                                    "*3   A/A   纯合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*3   G/A   杂合突变"
+
                             if fam_target == "560FAM2":
-                                file.write(
-                                    "*17  T/T   纯合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*17  C/T   杂合突变"
+
+                        if fam_ct > 36 >= vic_ct:
+                            if fam_target == "285FAM":
+                                result = "*2   A/A   纯合突变"
+
+                            if fam_target == "893FAM2":
+                                result = "*3   A/A   纯合突变"
+
+                            if fam_target == "560FAM2":
+                                result = "*17  T/T   纯合突变"
 
                     if type(vic_ct) is str:
                         if type(fam_ct) is float:
                             if fam_ct <= 36 and vic_ct == "Undetermined":
                                 if fam_target == "285FAM":
-                                    file.write(
-                                        "*2   G/G   纯合野生" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                            fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                            vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                    result = "*2   G/G   纯合野生"
+
                                 if fam_target == "893FAM2":
-                                    file.write(
-                                        "*3   G/G   纯合野生" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                            fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                            vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                    result = "*3   G/G   纯合野生"
+
                                 if fam_target == "560FAM2":
-                                    file.write(
-                                        "*17  C/C   纯合野生" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                            fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                            vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                    result = "*17  C/C   纯合野生"
 
                 if type(fam_ct) is str:
                     if type(vic_ct) is float:
                         if vic_ct <= 36 and fam_ct == "Undetermined":
                             if fam_target == "285FAM":
-                                file.write(
-                                    "*2   A/A   纯合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*2   A/A   纯合突变"
                             if fam_target == "893FAM2":
-                                file.write(
-                                    "*3   A/A   纯合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*3   A/A   纯合突变"
+
                             if fam_target == "560FAM2":
-                                file.write(
-                                    "*17  T/T   纯合突变" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                                result = "*17  T/T   纯合突变"
 
             elif float(rox_ct) > 32:
-                file.write(
-                    "ROX 异常" + "," + well + "," + sample_name + "," + fam_target + "," + fam_reporter + "," + str(
-                        fam_ct) + "," + vic_target + "," + vic_reporter + "," + str(
-                        vic_ct) + "," + rox_target + "," + rox_reporter + "," + str(rox_ct) + "\n")
+                result = "ROX 异常"
 
             else:
                 logging.error("has some  error! ")
                 break
+            file.write(f"{result},{','.join(_data)}\n")
+        else:
+            logging.warning(f"异常数据: {item}")
 
     file.close()
+    logging.info(f"完成! 处理条数: {count}")
 
 
 if __name__ == "__main__":
