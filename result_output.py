@@ -4,17 +4,15 @@ from xlrd import open_workbook
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-8s: %(message)s")
 
-# global variable
-data_fam = []
-data_vic = []
-data_rox = []
-data_total = []
-
 
 def read_excel(excel_path):
     '''
     读取表格实验数据信息直接过滤掉从7500导出excle的前六行信息
     '''
+    data_fam = []
+    data_vic = []
+    data_rox = []
+    data_total = []
 
     excel = open_workbook(excel_path)
     data = excel.sheet_by_index(0)
@@ -46,7 +44,7 @@ def read_excel(excel_path):
     return data_total
 
 
-def save_csv(csv_path):
+def save_csv(data_total, csv_path):
     '''
     判断分型结果后csv保存
     '''
@@ -195,5 +193,5 @@ if __name__ == "__main__":
     excel_path = "20191213-285-893-560-test_sample1_32_data.xls"
     csv_path = f"{excel_path[:-4]}" + "_output.csv"
 
-    read_excel(excel_path)
-    save_csv(csv_path)
+    data_total = read_excel(excel_path)
+    save_csv(data_total, csv_path)
