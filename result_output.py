@@ -6,9 +6,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-8s: %(m
 
 
 def read_excel(excel_path):
-    '''
+    """
     读取表格实验数据信息直接过滤掉从7500导出excle的前六行信息
-    '''
+    """
     data_fam = []
     data_vic = []
     data_rox = []
@@ -45,9 +45,9 @@ def read_excel(excel_path):
 
 
 def save_csv(data_total, csv_path):
-    '''
+    """
     判断分型结果后csv保存
-    '''
+    """
 
     file = open(csv_path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
     file.write(
