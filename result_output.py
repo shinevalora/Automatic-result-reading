@@ -68,6 +68,33 @@ def save_csv(data, path):
     file.write(",".join(field_name) + "\n")
 
     count = 0
+    fam_target_map = {
+        "fam_ct <= 36 < vic_ct": {
+            "285FAM": "*2  G/G   纯合野生",
+            "893FAM2": "*3  G/G   纯合野生",
+            "560FAM2": "*17  C/C   纯合野生",
+        },
+        "fam_ct <= 36 and vic_ct <= 36": {
+            "285FAM": "*2   G/A   杂合突变",
+            "893FAM2": "*3   G/A   杂合突变",
+            "560FAM2": "*17  C/T   杂合突变",
+        },
+        "fam_ct > 36 >= vic_ct": {
+            "285FAM": "*2   G/A   纯合突变",
+            "893FAM2": "*3   G/A   纯合突变",
+            "560FAM2": "*17  C/T   纯合突变",
+        },
+        "fam_ct <= 36 and vic_ct ==  'Undetermined'": {
+            "285FAM": "*2   G/A   纯合突变",
+            "893FAM2": "*3   G/A   纯合突变",
+            "560FAM2": "*17  C/T   纯合突变",
+        },
+        "vic_ct <= 36 and fam_ct == 'Undetermined'": {
+            "285FAM": "*2   A/A   纯合突变",
+            "893FAM2": "*3   A/A   纯合突变",
+            "560FAM2": "*17  A/A   纯合突变",
+        },
+    }
 
     for item in data:
         if item[0][0] == item[1][0] == item[2][0] and item[0][1] == item[1][1] == item[2][1]:
@@ -103,56 +130,23 @@ def save_csv(data, path):
                 if type(fam_ct) is float:
                     if type(vic_ct) is float:
                         if fam_ct <= 36 < vic_ct:
-                            if fam_target == "285FAM":
-                                result = "*2  G/G   纯合野生"
-
-                            if fam_target == "893FAM2":
-                                result = "*3  G/G   纯合野生"
-                            if fam_target == "560FAM2":
-                                result = "*17  C/C   纯合野生"
+                            result = fam_target_map["fam_ct <= 36 < vic_ct"][fam_target]
 
                         if fam_ct <= 36 and vic_ct <= 36:
-                            if fam_target == "285FAM":
-                                result = "*2   G/A   杂合突变"
-
-                            if fam_target == "893FAM2":
-                                result = "*3   G/A   杂合突变"
-
-                            if fam_target == "560FAM2":
-                                result = "*17  C/T   杂合突变"
+                            result = fam_target_map["fam_ct <= 36 and vic_ct <= 36"][fam_target]
 
                         if fam_ct > 36 >= vic_ct:
-                            if fam_target == "285FAM":
-                                result = "*2   A/A   纯合突变"
-
-                            if fam_target == "893FAM2":
-                                result = "*3   A/A   纯合突变"
-
-                            if fam_target == "560FAM2":
-                                result = "*17  T/T   纯合突变"
+                            result = fam_target_map["fam_ct <= 36 and vic_ct <= 36"][fam_target]
 
                     if type(vic_ct) is str:
                         if type(fam_ct) is float:
                             if fam_ct <= 36 and vic_ct == "Undetermined":
-                                if fam_target == "285FAM":
-                                    result = "*2   G/G   纯合野生"
-
-                                if fam_target == "893FAM2":
-                                    result = "*3   G/G   纯合野生"
-
-                                if fam_target == "560FAM2":
-                                    result = "*17  C/C   纯合野生"
+                                result = fam_target_map["fam_ct <= 36 and vic_ct ==  'Undetermined'"][fam_target]
 
                 if type(fam_ct) is str:
                     if type(vic_ct) is float:
                         if vic_ct <= 36 and fam_ct == "Undetermined":
-                            if fam_target == "285FAM":
-                                result = "*2   A/A   纯合突变"
-                            if fam_target == "893FAM2":
-                                result = "*3   A/A   纯合突变"
-
-                            if fam_target == "560FAM2":
-                                result = "*17  T/T   纯合突变"
+                            result = fam_target_map["vic_ct <= 36 and fam_ct == 'Undetermined'"][fam_target]
 
             elif float(rox_ct) > 32:
                 result = "ROX 异常"
