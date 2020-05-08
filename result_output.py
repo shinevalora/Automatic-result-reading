@@ -1,153 +1,170 @@
-
 import logging
 
-import xlrd
 from xlrd import open_workbook
 
-
-excel_path="20191213-285-893-560-test_sample1_32_data.xls"
-
-
-def read_excel():
-	'''
-	读取表格实验数据信息直接过滤掉从7500导出excle的前六行信息
-	'''
-
-	excel=open_workbook(excel_path)
-	data=excel.sheet_by_index(0)
-
-	rows=data.nrows
-	cols=data.ncols
-
-	logging.info(f"读取表格信息：\t{excel_path},\t{rows}\t行,\t{cols}\t列\n")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-8s: %(message)s")
 
 
-	for i in range(rows):
-		if i > 6:
-			data_value=data.row_values(i)
+def read_excel(path):
+    """
+    读取表格实验数据信息直接过滤掉从7500导出excle的前六行信息
+    """
+    data_fam = []
+    data_vic = []
+    data_rox = []
+    data_total = []
 
-			if "FAM" in data_value:
-				data_fam.append(data_value)
+    excel = open_workbook(path)
+    data = excel.sheet_by_index(0)
 
-			if "VIC" in data_value:
-				data_vic.append(data_value)
+    rows = data.nrows
+    cols = data.ncols
 
-			if "ROX" in data_value:
-				data_rox.append(data_value)
+    logging.info(f"读取表格信息：\t{path},\t{rows}\t行,\t{cols}\t列")
 
+    for i in range(rows):
+        if i > 6:
+            data_value = data.row_values(i)
 
+            if "FAM" in data_value:
+                data_fam.append(data_value)
 
-	for i,j,k in zip(data_fam,data_vic,data_rox):
-		_data=i,j,k
-		# logging.info(_data)
+            if "VIC" in data_value:
+                data_vic.append(data_value)
 
-		data_total.append(_data)
+            if "ROX" in data_value:
+                data_rox.append(data_value)
 
-	return data_total
+    for i, j, k in zip(data_fam, data_vic, data_rox):
+        _data = i, j, k
+        # logging.info(_data)
 
+        data_total.append(_data)
 
-def save_csv():
-	'''
-	判断分型结果后csv保存
-	'''
-	
-	file=open(csv_path,mode="w+")	# 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
-	file.write('Result'+","+'Well'+","+'Sample Name'+","+'Target Name'+","+'Reporter'+","+'Ct'+","+'Target Name'+","+'Reporter'+","+'Ct'+","+'Target Name'+","+'Reporter'+","+'Ct'+"\n")
-
-	for i,j in enumerate(data_total):		
-		if j[0][0]==j[1][0]==j[2][0] and j[0][1]==j[1][1]==j[2][1]:
-			well,sample_name=j[0][0],j[0][1]
-			fam_target,fam_reporter,fam_ct=j[0][2],j[0][4],j[0][6]
-			vic_target,vic_reporter,vic_ct=j[1][2],j[1][4],j[1][6]
-			rox_target,rox_reporter,rox_ct=j[2][2],j[2][4],j[2][6]
-
-			# print(well,sample_name,fam_target,fam_reporter,fam_ct,vic_target,vic_reporter,vic_ct,rox_target,rox_reporter,rox_ct)
-
-			if sample_name=="NTC":
-				if  str(fam_ct)=="Undetermined" and str(vic_ct)=="Undetermined" and str(rox_ct)=="Undetermined":		
-					file.write(","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-				else:
-					file.write("NTC  异常"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-			elif sample_name=="P":
-				if float(fam_ct)<=30 and float(vic_ct)<=30 and float(rox_ct)<=30:
-					file.write(","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-				else:
-					file.write("阳性对照  异常"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-
-			elif float(rox_ct)<=32:
-				if type(fam_ct) is float:
-					if type(vic_ct) is float:
-						if fam_ct<=36 and vic_ct>36:
-							if fam_target=="285FAM":
-								file.write("*2  G/G   纯合野生"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")					
-							if fam_target=="893FAM2":
-								file.write("*3  G/G   纯合野生"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-							if fam_target=="560FAM2":
-								file.write("*17  C/C   纯合野生"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-
-						if fam_ct<=36 and vic_ct<=36:
-							if fam_target=="285FAM":
-								file.write("*2   G/A   杂合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")					
-							if fam_target=="893FAM2":
-								file.write("*3   G/A   杂合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-							if fam_target=="560FAM2":
-								file.write("*17  C/T   杂合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-
-						if fam_ct>36 and vic_ct<=36:
-							if fam_target=="285FAM":
-								file.write("*2   A/A   纯合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-							if fam_target=="893FAM2":
-								file.write("*3   A/A   纯合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-							if fam_target=="560FAM2":
-								file.write("*17  T/T   纯合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-	
-					if type(vic_ct) is str:
-						if type(fam_ct) is float :
-							if fam_ct<=36 and vic_ct=="Undetermined":
-								if fam_target=="285FAM":
-									file.write("*2   G/G   纯合野生"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-								if fam_target=="893FAM2":
-									file.write("*3   G/G   纯合野生"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-								if fam_target=="560FAM2":
-									file.write("*17  C/C   纯合野生"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-
-				if type(fam_ct) is str:
-					if type(vic_ct) is float:
-						if vic_ct<=36 and fam_ct=="Undetermined":
-							if fam_target=="285FAM":
-								file.write("*2   A/A   纯合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-							if fam_target=="893FAM2":
-								file.write("*3   A/A   纯合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-							if fam_target=="560FAM2":
-								file.write("*17  T/T   纯合突变"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-			
-			elif float(rox_ct)>32:
-				file.write("ROX 异常"+","+well+","+sample_name+","+fam_target+","+fam_reporter+","+str(fam_ct)+","+vic_target+","+vic_reporter+","+str(vic_ct)+","+rox_target+","+rox_reporter+","+str(rox_ct)+"\n")
-
-			else:
-				exit(-1)
-
-	logging.info(f"此次实验总共有 {i+1} 个样本\n")
-
-	file.close()
+    return data_total
 
 
-if __name__=="__main__":
+def save_csv(data, path):
+    """
+    判断分型结果后csv保存
+    """
+    logging.info(f"此次实验总共有 {len(data)} 个样本")
+    field_name = [
+        'Result',
+        'Well',
+        'Sample Name',
+        'Target Name',
+        'Reporter',
+        'Ct',
+        'Target Name',
+        'Reporter',
+        'Ct',
+        'Target Name',
+        'Reporter',
+        'Ct'
+    ]
 
-	logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-8s: %(message)s")
+    file = open(path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
+    file.write(",".join(field_name) + "\n")
 
-	data_fam=[]
-	data_vic=[]
-	data_rox=[]
-	data_total=[]
+    count = 0
+    fam_target_map = {
+        "fam_ct <= 36 < vic_ct": {
+            "285FAM": "*2  G/G   纯合野生",
+            "893FAM2": "*3  G/G   纯合野生",
+            "560FAM2": "*17  C/C   纯合野生",
+        },
+        "fam_ct <= 36 and vic_ct <= 36": {
+            "285FAM": "*2   G/A   杂合突变",
+            "893FAM2": "*3   G/A   杂合突变",
+            "560FAM2": "*17  C/T   杂合突变",
+        },
+        "fam_ct > 36 >= vic_ct": {
+            "285FAM": "*2   G/A   纯合突变",
+            "893FAM2": "*3   G/A   纯合突变",
+            "560FAM2": "*17  C/T   纯合突变",
+        },
+        "fam_ct <= 36 and vic_ct ==  'Undetermined'": {
+            "285FAM": "*2   G/A   纯合突变",
+            "893FAM2": "*3   G/A   纯合突变",
+            "560FAM2": "*17  C/T   纯合突变",
+        },
+        "vic_ct <= 36 and fam_ct == 'Undetermined'": {
+            "285FAM": "*2   A/A   纯合突变",
+            "893FAM2": "*3   A/A   纯合突变",
+            "560FAM2": "*17  A/A   纯合突变",
+        },
+    }
 
-	read_excel()
+    for item in data:
+        if item[0][0] == item[1][0] == item[2][0] and item[0][1] == item[1][1] == item[2][1]:
+            count += 1
+            well, sample_name = item[0][0], item[0][1]
+            fam_target, fam_reporter, fam_ct = item[0][2], item[0][4], item[0][6]
+            vic_target, vic_reporter, vic_ct = item[1][2], item[1][4], item[1][6]
+            rox_target, rox_reporter, rox_ct = item[2][2], item[2][4], item[2][6]
 
-	csv_path=f"{excel_path[:-4]}"+"_output.csv"
-	
-	save_csv()
+            _data = [
+                well, sample_name, fam_target, fam_reporter, str(fam_ct), vic_target, vic_reporter, str(vic_ct),
+                rox_target, rox_reporter, str(rox_ct)
+            ]
+
+            _data = [str(i) for i in _data]
+
+            logging.debug(_data)
+
+            result = ""
+
+            if sample_name == "NTC":
+                if str(fam_ct) == "Undetermined" and str(vic_ct) == "Undetermined" and str(rox_ct) == "Undetermined":
+                    result = ""
+                else:
+                    result = "NTC  异常"
+            elif sample_name == "P":
+
+                if float(fam_ct) <= 30 and float(vic_ct) <= 30 and float(rox_ct) <= 30:
+                    result = ""
+                else:
+                    result = "阳性对照  异常"
+            elif float(rox_ct) <= 32:
+                if type(fam_ct) is float:
+                    if type(vic_ct) is float:
+                        if fam_ct <= 36 < vic_ct:
+                            result = fam_target_map["fam_ct <= 36 < vic_ct"][fam_target]
+
+                        if fam_ct <= 36 and vic_ct <= 36:
+                            result = fam_target_map["fam_ct <= 36 and vic_ct <= 36"][fam_target]
+
+                        if fam_ct > 36 >= vic_ct:
+                            result = fam_target_map["fam_ct <= 36 and vic_ct <= 36"][fam_target]
+
+                    if type(vic_ct) is str:
+                        if type(fam_ct) is float:
+                            if fam_ct <= 36 and vic_ct == "Undetermined":
+                                result = fam_target_map["fam_ct <= 36 and vic_ct ==  'Undetermined'"][fam_target]
+
+                if type(fam_ct) is str:
+                    if type(vic_ct) is float:
+                        if vic_ct <= 36 and fam_ct == "Undetermined":
+                            result = fam_target_map["vic_ct <= 36 and fam_ct == 'Undetermined'"][fam_target]
+
+            elif float(rox_ct) > 32:
+                result = "ROX 异常"
+
+            else:
+                logging.error("has some  error! ")
+                break
+            file.write(f"{result},{','.join(_data)}\n")
+        else:
+            logging.warning(f"异常数据: {item}")
+
+    file.close()
+    logging.info(f"完成! 处理条数: {count}")
 
 
+if __name__ == "__main__":
+    excel_path = "20191213-285-893-560-test_sample1_32_data.xls"
+    csv_path = f"{excel_path[:-4]}" + "_output.csv"
 
-
-
+    data_total = read_excel(excel_path)
+    save_csv(data_total, csv_path)
