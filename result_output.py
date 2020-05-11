@@ -72,29 +72,29 @@ def save_csv(data, path):
     count = 0
     fam_target_map = {
         "fam_ct <= 36 < vic_ct": {
-            "285FAM": "*2  G/G   纯合野生",
-            "893FAM2": "*3  G/G   纯合野生",
+            "285FAM": "*2    G/G   纯合野生",
+            "893FAM2": "*3   G/G   纯合野生",
             "560FAM2": "*17  C/C   纯合野生",
         },
         "fam_ct <= 36 and vic_ct <= 36": {
-            "285FAM": "*2   G/A   杂合突变",
+            "285FAM": "*2    G/A   杂合突变",
             "893FAM2": "*3   G/A   杂合突变",
             "560FAM2": "*17  C/T   杂合突变",
         },
         "fam_ct > 36 >= vic_ct": {
-            "285FAM": "*2   G/A   纯合突变",
-            "893FAM2": "*3   G/A   纯合突变",
-            "560FAM2": "*17  C/T   纯合突变",
+            "285FAM": "*2    A/A   纯合突变",
+            "893FAM2": "*3   A/A   纯合突变",
+            "560FAM2": "*17  T/T   纯合突变",
         },
         "fam_ct <= 36 and vic_ct ==  'Undetermined'": {
-            "285FAM": "*2   G/A   纯合野生",
-            "893FAM2": "*3   G/A   纯合野生",
-            "560FAM2": "*17  C/T   纯合野生",
+            "285FAM": "*2    G/G  纯合野生",
+            "893FAM2": "*3   G/G  纯合野生",
+            "560FAM2": "*17  C/C  纯合野生",
         },
         "vic_ct <= 36 and fam_ct == 'Undetermined'": {
-            "285FAM": "*2   A/A   纯合突变",
+            "285FAM": "*2    A/A   纯合突变",
             "893FAM2": "*3   A/A   纯合突变",
-            "560FAM2": "*17  A/A   纯合突变",
+            "560FAM2": "*17  T/T   纯合突变",
         },
     }
 
