@@ -17,12 +17,14 @@ def read_excel(path):
     excel = open_workbook(path)
     data = excel.sheet_by_index(0)
 
+    # 表格中共有多少行多少列数据信息
     rows = data.nrows
     cols = data.ncols
 
     logging.info(f"读取表格信息：\t{path},\t{rows}\t行,\t{cols}\t列")
 
     for i in range(rows):
+        # 过滤前六行表头信息
         if i > 6:
             data_value = data.row_values(i)
 
@@ -34,7 +36,7 @@ def read_excel(path):
 
             if "ROX" in data_value:
                 data_rox.append(data_value)
-
+    # 为每一个样本的所有检测位点都归为一个小列表
     for i, j, k in zip(data_fam, data_vic, data_rox):
         _data = i, j, k
         # logging.info(_data)
@@ -85,9 +87,9 @@ def save_csv(data, path):
             "560FAM2": "*17  C/T   纯合突变",
         },
         "fam_ct <= 36 and vic_ct ==  'Undetermined'": {
-            "285FAM": "*2   G/A   纯合突变",
-            "893FAM2": "*3   G/A   纯合突变",
-            "560FAM2": "*17  C/T   纯合突变",
+            "285FAM": "*2   G/A   纯合野生",
+            "893FAM2": "*3   G/A   纯合野生",
+            "560FAM2": "*17  C/T   纯合野生",
         },
         "vic_ct <= 36 and fam_ct == 'Undetermined'": {
             "285FAM": "*2   A/A   纯合突变",
@@ -97,6 +99,7 @@ def save_csv(data, path):
     }
 
     for item in data:
+        # 样本孔号和样本名字信息需一一对等的才可比较进行；
         if item[0][0] == item[1][0] == item[2][0] and item[0][1] == item[1][1] == item[2][1]:
             count += 1
             well, sample_name = item[0][0], item[0][1]
@@ -112,6 +115,8 @@ def save_csv(data, path):
             _data = [str(i) for i in _data]
 
             logging.debug(_data)
+
+            # logging.info(f"fam_target is {fam_target}")
 
             result = ""
 
@@ -130,6 +135,7 @@ def save_csv(data, path):
                 if type(fam_ct) is float:
                     if type(vic_ct) is float:
                         if fam_ct <= 36 < vic_ct:
+                            # 映射target类别及类型
                             result = fam_target_map["fam_ct <= 36 < vic_ct"][fam_target]
 
                         if fam_ct <= 36 and vic_ct <= 36:
