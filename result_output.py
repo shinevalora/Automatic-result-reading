@@ -142,7 +142,7 @@ def save_csv(data, path):
                             result = fam_target_map["fam_ct <= 36 and vic_ct <= 36"][fam_target]
 
                         if fam_ct > 36 >= vic_ct:
-                            result = fam_target_map["fam_ct <= 36 and vic_ct <= 36"][fam_target]
+                            result = fam_target_map["fam_ct > 36 >= vic_ct"][fam_target]
 
                     if type(vic_ct) is str:
                         if type(fam_ct) is float:
