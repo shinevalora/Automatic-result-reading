@@ -1,3 +1,7 @@
+# _*_coding:utf-8_*_
+#  作者    : shinevalora
+#  创建时间: 2020/6/16  13:07
+
 import logging
 
 from xlrd import open_workbook
@@ -46,11 +50,11 @@ def read_excel(path):
     return data_total
 
 
-def save_csv(data, path):
+def save_txt(data, txt_path):
     """
-    判断分型结果后csv保存
+    判断分型结果后txt保存
     """
-    logging.info(f"此次实验总共有 {len(data)} 个样本")
+    logging.info(f"此次实验总共有 {int(len(data) / 3)} 个样本")  # 一个样本有三个位点
     field_name = [
         'Result',
         'Well',
@@ -66,7 +70,7 @@ def save_csv(data, path):
         'Ct'
     ]
 
-    file = open(path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
+    file = open(txt_path, mode="w+")  # 如若出现乱码可指定编码，常用 encoding="gb2312",encoding="utf-8"
     file.write(",".join(field_name) + "\n")
 
     count = 0
@@ -168,9 +172,47 @@ def save_csv(data, path):
     logging.info(f"完成! 处理条数: {count}")
 
 
+def save_csv(txt_path, csv_path):
+    '''
+    根据样本名称合并分型判断结果
+    '''
+    logging.info(f'(备份信息)样本分型结果已保存至{txt_path}')
+
+    data_list = []
+    with open(txt_path) as f:
+        lines = f.readlines()
+        for line_counter, line in enumerate(lines):
+            if line_counter != 0:  # skip the title of file
+                temp_list = []
+                data = line.split(',')
+                temp_dict = {data[2]: data}
+                temp_list.append(temp_dict)
+                data_list.extend(temp_list)
+
+    dic = {}
+    for _ in data_list:
+        for k, v in _.items():
+            dic.setdefault(k, []).append(v)
+
+    result = [
+        '样本名称',
+        '*2 结果',
+        '*3 结果',
+        '*17 结果',
+        '判断分型结果数据'
+    ]
+    with open(csv_path, 'w+') as f:
+        f.write(str(result) + '\n')
+        for k, v in dic.items():
+            f.write(str((k, ','.join((v[0][0], v[1][0], v[2][0])), v)) + "\n")
+    logging.info(f'样本分型结果已保存至{csv_path}')
+
+
 if __name__ == "__main__":
-    excel_path = "20191213-285-893-560-test_sample1_32_data.xls"
+    excel_path = "20200612 285 893 560 SAMPLE TEST_data.xls"
+    txt_path = f"{excel_path[:-4]}" + "_output.txt"
     csv_path = f"{excel_path[:-4]}" + "_output.csv"
 
     data_total = read_excel(excel_path)
-    save_csv(data_total, csv_path)
+    save_txt(data_total, txt_path)
+    save_csv(txt_path, csv_path)
