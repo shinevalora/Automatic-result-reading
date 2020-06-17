@@ -170,13 +170,13 @@ def save_txt(data, txt_path):
 
     file.close()
     logging.info(f"完成! 处理条数: {count}")
+    logging.info(f'(备份信息)样本分型结果已保存至{txt_path}')
 
 
 def save_csv(txt_path, csv_path):
     '''
     根据样本名称合并分型判断结果
     '''
-    logging.info(f'(备份信息)样本分型结果已保存至{txt_path}')
 
     data_list = []
     with open(txt_path) as f:
@@ -204,12 +204,17 @@ def save_csv(txt_path, csv_path):
     with open(csv_path, 'w+') as f:
         f.write(str(result) + '\n')
         for k, v in dic.items():
-            f.write(str((k, ','.join((v[0][0], v[1][0], v[2][0])), v)) + "\n")
+            try:
+                f.write(str((k, ','.join((v[0][0], v[1][0], v[2][0])), v)) + "\n")
+            except Exception as e:
+                f.write(','.join((k, str(e), '\n')))
+                logging.error(f'异常 {e}')
+
     logging.info(f'样本分型结果已保存至{csv_path}')
 
 
 if __name__ == "__main__":
-    excel_path = "20200612 285 893 560 SAMPLE TEST_data.xls"
+    excel_path = "20191213-285-893-560-test_sample1_32_data.xls"
     txt_path = f"{excel_path[:-4]}" + "_output.txt"
     csv_path = f"{excel_path[:-4]}" + "_output.csv"
 
