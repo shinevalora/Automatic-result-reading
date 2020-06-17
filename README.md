@@ -12,3 +12,7 @@ pip install xlrd
 ```bash
 python result_output.py
 ```
+
+## 图谱
+
+![Automatic-result-reading](E:\Desktop\Automatic-result-reading.png)
