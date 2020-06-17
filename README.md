@@ -1,4 +1,4 @@
-# Automatic-result-reading
+﻿# Automatic-result-reading
 7500  导出的excel文件自动判读并分型
 
 
@@ -15,4 +15,11 @@ python result_output.py
 
 ## 图谱
 
-![Automatic-result-reading](E:\Desktop\Automatic-result-reading.png)
+![image_1eb18uob81sscmetjfn8mr1scc9.png-596.7kB][1]
+
+
+
+---
+
+
+  [1]: http://static.zybuluo.com/Valora/equ9irvxzay3zcftrmm298xh/image_1eb18uob81sscmetjfn8mr1scc9.png
